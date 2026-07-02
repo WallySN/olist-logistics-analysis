@@ -1,0 +1,11 @@
+# Archivos grandes que no subir a GitHub
+archive/
+*.csv
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+
+# MySQL backups
+*.bak
