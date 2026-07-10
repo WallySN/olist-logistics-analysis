@@ -4,18 +4,18 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from sqlalchemy import create_engine
 import os
+from db_config import get_engine
 
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 7)
 plt.rcParams['font.size'] = 10
 
-print("Conectando a PostgreSQL...")
-engine = create_engine('postgresql://postgres:MySQL_2026!@localhost:5434/olist_db')
+print("Conectando a PostgreSQL (Docker)...")
+engine = get_engine()
 print("Conectado!")
 
-os.makedirs('C:/data/olist/images', exist_ok=True)
+pass  # directorio ya existe
 
 # ============================================
 # ANALISIS 1: TIEMPOS DE ENTREGA POR ESTADO
@@ -44,7 +44,7 @@ for i, v in enumerate(df1['avg_days']):
     ax.text(v + 0.3, i, f'{v} dias', va='center', fontsize=9)
 
 plt.tight_layout()
-plt.savefig('C:/data/olist/images/01_entrega_por_estado.png', dpi=300, bbox_inches='tight')
+plt.savefig('/app/images/01_entrega_por_estado.png', dpi=300, bbox_inches='tight')
 plt.close()
 print("Grafico 1 guardado: 01_entrega_por_estado.png")
 
@@ -121,17 +121,16 @@ if len(df2) > 0:
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig('C:/data/olist/images/02_velocidad_vs_satisfaccion.png', dpi=300, bbox_inches='tight')
+    plt.savefig('/app/images/02_velocidad_vs_satisfaccion.png', dpi=300, bbox_inches='tight')
     plt.close()
     print("Grafico 2 guardado: 02_velocidad_vs_satisfaccion.png")
 else:
     print("No hay datos suficientes para generar el grafico 2")
 
 # ============================================
-# ANALISIS 3: TOP 10 CATEGORIAS (CORREGIDO)
+# ANALISIS 3: TOP 10 CATEGORIAS
 # ============================================
 print("\nAnalisis 3: Top 10 categorias mas rentables...")
-# CORRECCION: PostgreSQL usa ROUND() con ::numeric, no como MySQL
 query3 = """
 SELECT 
     ct.product_category_name_english as category,
@@ -162,7 +161,7 @@ ax2.set_xlabel('Total de ordenes')
 
 fig.suptitle('Top 10 Categorias - Olist E-Commerce', fontsize=15, fontweight='bold', y=1.02)
 plt.tight_layout()
-plt.savefig('C:/data/olist/images/03_top_categorias.png', dpi=300, bbox_inches='tight')
+plt.savefig('/app/images/03_top_categorias.png', dpi=300, bbox_inches='tight')
 plt.close()
 print("Grafico 3 guardado: 03_top_categorias.png")
 
@@ -207,7 +206,7 @@ for i, v in enumerate(df4['total_value']):
     ax2.text(i, v + 10000, f'${v:,.0f}', ha='center', fontsize=10)
 
 plt.tight_layout()
-plt.savefig('C:/data/olist/images/04_metodos_pago.png', dpi=300, bbox_inches='tight')
+plt.savefig('/app/images/04_metodos_pago.png', dpi=300, bbox_inches='tight')
 plt.close()
 print("Grafico 4 guardado: 04_metodos_pago.png")
 
@@ -217,7 +216,7 @@ print("Grafico 4 guardado: 04_metodos_pago.png")
 print("\n" + "="*50)
 print("TODOS LOS ANALISIS COMPLETADOS!")
 print("="*50)
-print("Graficos guardados en: C:/data/olist/images/")
+print("Graficos guardados en: /app/images/")
 print("\nArchivos generados:")
 print("  1. 01_entrega_por_estado.png")
 print("  2. 02_velocidad_vs_satisfaccion.png")

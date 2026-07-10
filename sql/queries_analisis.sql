@@ -1,14 +1,15 @@
-USE olist_db;
-
 SELECT 
-    c.customer_state AS estado,
+    CASE 
+        WHEN DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp) <= 7 THEN '0-7 días'
+        WHEN DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp) <= 14 THEN '8-14 días'
+        WHEN DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp) <= 21 THEN '15-21 días'
+        ELSE 'Más de 21 días'
+    END AS rango_entrega,
     COUNT(*) AS total_ordenes,
-    ROUND(AVG(DATEDIFF(o.order_delivered_customer_date, o.order_purchase_timestamp)), 1) AS dias_promedio_entrega,
-    ROUND(AVG(DATEDIFF(o.order_estimated_delivery_date, o.order_delivered_customer_date)), 1) AS dias_promedio_retraso,
-    ROUND(COUNT(CASE WHEN o.order_delivered_customer_date <= o.order_estimated_delivery_date THEN 1 END) * 100.0 / COUNT(*), 1) AS pct_entregas_a_tiempo
+    ROUND(AVG(r.review_score), 2) AS calificacion_promedio,
+    ROUND(COUNT(CASE WHEN r.review_score >= 4 THEN 1 END) * 100.0 / COUNT(*), 1) AS pct_satisfechos
 FROM orders o
-JOIN customers c ON o.customer_id = c.customer_id
+JOIN order_reviews r ON o.order_id = r.order_id
 WHERE o.order_delivered_customer_date IS NOT NULL
-  AND o.order_status = 'delivered'
-GROUP BY c.customer_state
-ORDER BY dias_promedio_entrega DESC;
+GROUP BY rango_entrega
+ORDER BY calificacion_promedio DESC;
